@@ -1,0 +1,159 @@
+/* 기본 스타일 초기화 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: #3498db;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Header 스타일 */
+header.site-header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+header .site-title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+header .site-subtitle {
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+/* Navigation 스타일 */
+nav.main-nav {
+  background-color: #34495e;
+  padding: 20px;
+  color: white;
+  margin-top: 20px;
+}
+
+nav.main-nav .nav-header {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+nav.main-nav ul.nav-list {
+  list-style-type: none;
+}
+
+nav.main-nav li.nav-item {
+  margin: 10px 0;
+}
+
+nav.main-nav li.nav-item a {
+  color: #ecf0f1;
+  font-weight: bold;
+}
+
+nav.main-nav li.nav-item a:hover {
+  color: #e67e22;
+}
+
+/* Main Content 스타일 */
+main.main-content {
+  padding: 30px;
+  background-color: white;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+main .page-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+main .article-text {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+/* 이미지 스타일 */
+figure {
+  text-align: center;
+  margin: 20px 0;
+}
+
+figure img {
+  width: 300px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+figure figcaption {
+  font-size: 0.9rem;
+  margin-top: 8px;
+  color: #777;
+}
+
+/* Footer 스타일 */
+footer.footer {
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+footer .footer-section {
+  margin: 10px;
+}
+
+footer .footer-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+footer .nav-list {
+  list-style-type: none;
+}
+
+footer .nav-item a {
+  color: #ecf0f1;
+}
+
+footer .nav-item a:hover {
+  color: #e67e22;
+}
+
+footer .button {
+  background-color: #e67e22;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+footer .button:hover {
+  background-color: #d35400;
+}
+
+footer p {
+  margin: 10px 0;
+  font-size: 0.8rem;
+}
