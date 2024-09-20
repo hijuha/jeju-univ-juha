@@ -5,10 +5,38 @@
   </head>
   <body>
     <script>
-      // TODO: Add setTimeout code
-      setTimeout(() => {
-        document.write("...Hello again!");
-      }, 2000);
+      const NAME = "송주하";
+      const AGE = 26;
+
+      function useHello() {
+        document.write("안녕하세요.");
+      }
+
+      function useName() {
+        document.write(`제 이름은 ${NAME}입니다.`);
+      }
+
+      function useAge() {
+        document.write(`나이는 ${AGE} 입니다.`);
+      }
+      var nParam = 1;
+
+      setInterval(introduce, 3000);
+
+      function introduce() {
+        document.body.innerHTML = "";
+
+        if (nParam === 1) {
+          useHello();
+          nParam++;
+        } else if (nParam === 2) {
+          useName();
+          nParam++;
+        } else if (nParam === 3) {
+          useAge();
+          nParam = 1; // 다시 처음으로 돌아감
+        }
+      }
     </script>
   </body>
 </html>
