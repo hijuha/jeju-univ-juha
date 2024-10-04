@@ -1,42 +1,140 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Message</title>
+    <title>Welcome to my Virtual Terrarium</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./terrarium.css" />
   </head>
   <body>
-    <script>
-      const NAME = "송주하";
-      const AGE = 26;
+    <h1 style="color: red">My Terrarium</h1>
 
-      function useHello() {
-        document.write("안녕하세요.");
-      }
+    <div id="page">
+      <div id="left-container" class="container">
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant1"
+            src="./images/plant1.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant2"
+            src="./images/plant2.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant3"
+            src="./images/plant13.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant4"
+            src="./images/plant4.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant5"
+            src="./images/plant5.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant6"
+            src="./images/plant6.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant7"
+            src="./images/plant7.png"
+          />
+        </div>
+      </div>
+      <div id="right-container" class="container">
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant8"
+            src="./images/plant8.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant9"
+            src="./images/plant9.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant10"
+            src="./images/plant10.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant11"
+            src="./images/plant11.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant12"
+            src="./images/plant12.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant13"
+            src="./images/plant13.png"
+          />
+        </div>
+        <div class="plant-holder">
+          <img
+            class="plant"
+            alt="plant"
+            id="plant14"
+            src="./images/plant14.png"
+          />
+        </div>
+      </div>
+    </div>
 
-      function useName() {
-        document.write(`제 이름은 ${NAME}입니다.`);
-      }
-
-      function useAge() {
-        document.write(`나이는 ${AGE} 입니다.`);
-      }
-      var nParam = 1;
-
-      setInterval(introduce, 3000);
-
-      function introduce() {
-        document.body.innerHTML = "";
-
-        if (nParam === 1) {
-          useHello();
-          nParam++;
-        } else if (nParam === 2) {
-          useName();
-          nParam++;
-        } else if (nParam === 3) {
-          useAge();
-          nParam = 1; // 다시 처음으로 돌아감
-        }
-      }
-    </script>
+    <div class="jar-top"></div>
+    <div class="jar-walls">
+      <div class="jar-glossy-long"></div>
+      <div class="jar-glossy-short"></div>
+    </div>
+    <div class="dirt"></div>
+    <div class="jar-bottom"></div>
   </body>
 </html>

@@ -1,0 +1,144 @@
+h1 {
+  color: blue;
+  text-align: center;
+}
+
+body {
+  font-family: helvetica, arial, sans-serif;
+}
+
+#left-container {
+  background-color: #ffdbc7;
+  width: 15%;
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  height: 100%;
+  padding: 10px;
+}
+
+#right-container {
+  background-color: #ffdbc7;
+  width: 15%;
+  right: 0px;
+  top: 0px;
+  position: absolute;
+  height: 100%;
+  padding: 10px;
+}
+
+#left-container {
+  left: 0px;
+}
+
+#right-container {
+  right: 0px;
+}
+
+.container {
+  background-color: #fdb36e;
+  width: 15%;
+  top: 0px;
+  position: absolute;
+  height: 100%;
+  padding: 10px;
+}
+
+.plant-holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 10%;
+  left: -10px;
+  width: 100%;
+  margin: 5% auto;
+}
+
+.plant {
+  position: absolute;
+  max-width: 100%;
+  max-height: 100%;
+  z-index: 2;
+}
+
+/* #terraium {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 10%;
+  height: 60%;
+} */
+
+.jar-walls {
+  height: 60%;
+  width: 40%;
+  background: #d1e1df;
+  border-radius: 4rem;
+  position: absolute;
+  bottom: 3%;
+  left: 30%;
+  opacity: 0.5;
+  z-index: 2;
+}
+
+.jar-top {
+  width: 30%;
+  height: 10px;
+  background: #d1e1df;
+  position: absolute;
+  bottom: 65%;
+  left: 35%;
+  opacity: 0.7;
+  z-index: 1;
+}
+
+.jar-bottom {
+  width: 30%;
+  height: 1%;
+  background: #d1e1df;
+  position: absolute;
+  bottom: 0%;
+  left: 35%;
+  opacity: 0.7;
+  z-index: -2;
+}
+
+.dirt {
+  width: 40%;
+  height: 5%;
+  background: #3a241d;
+  position: absolute;
+  border-radius: 0 0 10rem 10rem;
+  bottom: 3%;
+  left: 30%;
+  opacity: 0.7;
+  z-index: -1;
+}
+
+.jar-glossy-long {
+  background: #ffffff;
+  border-radius: 30%;
+  position: absolute;
+  bottom: 15%;
+  left: 5%;
+  width: 4px;
+  height: 30%;
+}
+
+.jar-glossy-short {
+  background: #ffffff;
+  border-radius: 25%;
+  position: absolute;
+  bottom: 55%;
+  left: 5%;
+  width: 4px;
+  height: 5%;
+}
+
+div {
+  width: 200px;
+  height: 100px;
+  padding: 10px;
+}
