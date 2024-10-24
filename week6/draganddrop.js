@@ -1,5 +1,5 @@
 let highestZIndex = 10;
-let topPlant = null; // 최상단 요소를 추적
+let topPlant = null;
 
 let offsetX = 0;
 let offsetY = 0;
