@@ -1,11 +1,12 @@
 let highestZIndex = 10;
-let topPlant = null;
 
 let offsetX = 0;
 let offsetY = 0;
 
 function dragStart(e) {
   const plant = e.target;
+  console.log(plant.offsetLeft);
+  console.log(plant.offsetTop);
 
   offsetX = e.clientX - plant.offsetLeft;
   offsetY = e.clientY - plant.offsetTop;
@@ -25,22 +26,21 @@ function drop(e) {
   const newLeft = e.clientX - offsetX;
   const newTop = e.clientY - offsetY;
 
-  console.log(newLeft);
-  console.log(newTop);
+  // console.log(newLeft);
+  // console.log(newTop);
 
   plant.style.left = `${newLeft}px`;
   plant.style.top = `${newTop}px`;
 }
 
-function bringToFront(e) {
+function goTopElement(e) {
   highestZIndex++;
   e.target.style.zIndex = highestZIndex;
-  topPlant = e.target.id;
 }
 
 document.querySelectorAll(".plant").forEach((plant) => {
   plant.addEventListener("dragstart", dragStart);
-  plant.addEventListener("dblclick", bringToFront);
+  plant.addEventListener("dblclick", goTopElement);
 });
 
 document.body.addEventListener("dragover", dragOver);
