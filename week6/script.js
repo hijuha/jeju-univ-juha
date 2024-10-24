@@ -35,10 +35,10 @@ function dragElement(terrariumElement) {
   terrariumElement.onpointerdown = pointerDrag;
 
   terrariumElement.ondblclick = () => {
-    const top = terrariumElement.id;
-    document.getElementById(topPlant).zIndex = 5;
-    top.zIndex = 6;
-    topPlant = top;
+    // const top = terrariumElement.id;
+    // document.getElementById(topPlant).zIndex = 5;
+    // top.zIndex = 6;
+    // topPlant = top;
 
     highestZIndex++;
     terrariumElement.style.zIndex = highestZIndex;
