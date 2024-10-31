@@ -12,13 +12,24 @@
       Practice your typing skills with a quote from Sherlock Holmes. Click
       **start** to begin!
     </p>
-    <p id="quote"></p>
-    <p id="message"></p>
-    <div>
+    <p id="quote" class="main-p"></p>
+    <p id="message" class="main-p"></p>
+    <div class="button-container">
       <input type="text" aria-label="current word" id="typed-value" />
       <button type="button" id="start">Start</button>
       <button type="button" id="reset">Reset</button>
     </div>
+
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="modal-message" class="modal-p"></p>
+        <p id="score" class="modal-p">
+          Best Score: <span id="best-score"></span> 초
+        </p>
+      </div>
+    </div>
+
     <script src="./script.js"></script>
   </body>
 </html>
