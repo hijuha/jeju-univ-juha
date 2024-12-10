@@ -79,7 +79,7 @@ class Hero extends GameObject {
         laser = new Laser(this.x + 45, this.y - 10);
       }
       gameObjects.push(laser);
-      this.cooldown = 500; // 쿨다운 500ms
+      this.cooldown = 500;
 
       let id = setInterval(() => {
         if (this.cooldown > 0) {
@@ -153,7 +153,6 @@ class Enemy extends GameObject {
       if (this.y < canvas.height - this.height) {
         this.y += 5; // 아래로 이동
       } else {
-        // console.log("Stopped at", this.y);
         clearInterval(id); // 화면 끝에 도달하면 정지
       }
     }, 300);
@@ -168,9 +167,9 @@ class Boss extends GameObject {
     this.type = "Boss";
     this.maxLife = 200;
     this.life = this.maxLife;
-    this.img = bossImg; // 보스 이미지
-    this.speed1 = 10; // 보스 등장 이동 속도
-    this.speed2 = 5; // 보스 패턴 이동 속도
+    this.img = bossImg;
+    this.speed1 = 10;
+    this.speed2 = 5;
     this.isMovingToCenter = true; // 중앙으로 내려가는 상태 확인
     this.isMovingLeftRight = false; // 좌우로 이동하는 상태 확인
     this.moveDirection = "right"; // 초기 좌우 이동 방향
@@ -178,25 +177,22 @@ class Boss extends GameObject {
     // 보스를 화면 상단 밖에서 시작
     this.y = -this.height;
 
-    // 보스가 중앙 상단으로부터 내려오기
     this.moveInterval = setInterval(() => {
       if (this.isMovingToCenter) {
-        // 중앙으로 내려가기 (y축)
         if (this.y < (canvas.height * 1) / 4 - (this.height * 2) / 3) {
-          this.y += this.speed1; // 아래로 이동
+          this.y += this.speed1;
         } else {
-          this.isMovingToCenter = false; // 중앙에 도달하면 좌우 이동으로 변경
+          this.isMovingToCenter = false;
           this.isMovingLeftRight = true;
         }
       } else if (this.isMovingLeftRight) {
-        // 중앙에 도달하면 좌우로 이동
         if (this.moveDirection === "right") {
-          this.x += this.speed2; // 오른쪽으로 이동
+          this.x += this.speed2;
           if (this.x > canvas.width - this.width) {
             this.moveDirection = "left"; // 오른쪽 끝에 도달하면 왼쪽으로 이동
           }
         } else if (this.moveDirection === "left") {
-          this.x -= this.speed2; // 왼쪽으로 이동
+          this.x -= this.speed2;
           if (this.x < 0) {
             this.moveDirection = "right"; // 왼쪽 끝에 도달하면 오른쪽으로 이동
           }
@@ -221,15 +217,6 @@ class Boss extends GameObject {
       hero
     );
     gameObjects.push(attack);
-  }
-
-  decrementLife(damage) {
-    this.life -= damage;
-    if (this.life <= 0) {
-      this.dead = true;
-      clearInterval(this.moveInterval); // 보스가 죽으면 이동 멈춤
-      clearInterval(this.attackInterval); // 보스가 죽으면 공격 멈춤
-    }
   }
 
   // 보스의 HP를 게이지 형태로 화면 상단에 표시
