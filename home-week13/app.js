@@ -27,29 +27,70 @@ class GameObject {
 class Hero extends GameObject {
   constructor(x, y, w, h) {
     super(x, y);
-    (this.width = w), (this.height = h);
+    this.width = w;
+    this.height = h;
     this.type = "Hero";
     this.speed = { x: 0, y: 0 };
     this.cooldown = 0;
     this.life = 3;
     this.points = 0;
+    this.chargeTime = 0;
+    this.isCharging = false;
+    this.isCharged = false;
   }
 
-  fire(xoffset = 0) {
+  async startCharging() {
+    console.log("차징 시작");
+    this.isCharging = true;
+    this.chargeTime = 0;
+    this.isCharged = false;
+
+    const chargeDuration = 3000; // 차징 시간 3초
+    const chargeInterval = setInterval(() => {
+      this.chargeTime += 100;
+      if (this.chargeTime >= chargeDuration) {
+        this.isCharged = true;
+        clearInterval(chargeInterval);
+        console.log(`차징 완료! ${this.isCharged}`);
+      }
+    }, 100);
+  }
+
+  releaseCharge() {
+    console.log(this.isCharged);
+    if (this.isCharged) {
+      this.fire(true); // 차지된 상태에서는 강화된 레이저 발사
+      this.isCharging = false;
+      this.isCharged = false;
+      console.log("차지된 공격 발사!");
+    } else {
+      console.log("차징이 완료되지 않았습니다");
+    }
+  }
+
+  fire(charge = false) {
     if (this.canFire()) {
-      gameObjects.push(new Laser(this.x + 45 + xoffset, this.y - 10)); // 레이저 발사
+      let laser;
+      if (charge && this === hero && this.isCharged) {
+        laser = new ChargedLaser(this.x + 45, this.y - 10); // 차지된 상태에서는 강화된 레이저
+      } else {
+        laser = new Laser(this.x + 45, this.y - 10); // 기본 레이저
+      }
+      gameObjects.push(laser);
       this.cooldown = 500; // 쿨다운 500ms
+
       let id = setInterval(() => {
         if (this.cooldown > 0) {
           this.cooldown -= 100;
         } else {
-          clearInterval(id); //쿨다운 완료 후 타이머 종료
+          clearInterval(id);
         }
       }, 100);
     }
   }
+
   canFire() {
-    return this.cooldown === 0; // 쿨다운이 끝났는지 확인
+    return this.cooldown === 0;
   }
 
   decrementLife() {
@@ -67,9 +108,13 @@ class Hero extends GameObject {
 class Laser extends GameObject {
   constructor(x, y) {
     super(x, y);
-    (this.width = 9), (this.height = 33);
+    this.width = 9;
+    this.height = 33;
     this.type = "Laser";
-    this.img = laserImg;
+    this.img = laserImg; // 기본 레이저 이미지
+    this.speed = 15; // 기본 속도
+    this.damage = 1; // 기본 데미지
+
     let id = setInterval(() => {
       if (this.y > 0) {
         this.y -= 15; // 레이저가 위로 이동
@@ -78,6 +123,17 @@ class Laser extends GameObject {
         clearInterval(id);
       }
     }, 100);
+  }
+}
+
+class ChargedLaser extends Laser {
+  constructor(x, y) {
+    super(x, y);
+    this.width = 18; // 강화된 레이저는 더 큰 크기
+    this.height = 66; // 강화된 레이저는 더 큰 크기
+    this.img = chargedLaserImg; // 강화된 레이저 이미지
+    this.speed = 30; // 강화된 레이저는 더 빠르게 이동
+    this.damage = 5; // 강화된 레이저는 더 큰 데미지
   }
 }
 
@@ -92,10 +148,78 @@ class Enemy extends GameObject {
       if (this.y < canvas.height - this.height) {
         this.y += 5; // 아래로 이동
       } else {
-        console.log("Stopped at", this.y);
+        // console.log("Stopped at", this.y);
         clearInterval(id); // 화면 끝에 도달하면 정지
       }
     }, 300);
+  }
+}
+
+class Boss extends GameObject {
+  constructor(x, y) {
+    super(x, y);
+    this.width = 100;
+    this.height = 100;
+    this.type = "Boss";
+    this.life = 200; // 보스의 체력
+    this.img = bossImg; // 보스 이미지
+    this.speed = 5; // 보스 이동 속도
+
+    // 보스가 Hero를 향해 이동
+    this.moveInterval = setInterval(() => {
+      if (this.x < hero.x) {
+        this.x += this.speed; // Hero를 향해 오른쪽으로 이동
+      } else if (this.x > hero.x) {
+        this.x -= this.speed; // Hero를 향해 왼쪽으로 이동
+      }
+
+      if (this.y < hero.y) {
+        this.y += this.speed; // Hero를 향해 아래로 이동
+      } else if (this.y > hero.y) {
+        this.y -= this.speed; // Hero를 향해 위로 이동
+      }
+    }, 100);
+
+    // 보스 공격
+    this.attackInterval = setInterval(() => {
+      this.attack();
+    }, 2000); // 2초마다 공격
+  }
+
+  attack() {
+    let attack = new BossAttack(this.x + this.width / 2, this.y + this.height);
+    gameObjects.push(attack);
+  }
+
+  decrementLife(damage) {
+    this.life -= damage;
+    if (this.life <= 0) {
+      this.dead = true;
+      clearInterval(this.moveInterval); // 보스가 죽으면 이동 멈춤
+      clearInterval(this.attackInterval); // 보스가 죽으면 공격 멈춤
+    }
+  }
+}
+
+class BossAttack extends GameObject {
+  constructor(x, y) {
+    super(x, y);
+    this.width = 20;
+    this.height = 30;
+    this.type = "BossAttack";
+    this.img = bossAttackImg; // 보스 공격 이미지
+    this.speed = 10; // 공격 속도
+    this.damage = 10; // 공격 데미지
+
+    // 공격은 아래로 이동
+    let id = setInterval(() => {
+      if (this.y < canvas.height) {
+        this.y += this.speed; // 공격이 아래로 이동
+      } else {
+        this.dead = true; // 화면 아래로 내려가면 제거
+        clearInterval(id);
+      }
+    }, 100);
   }
 }
 
@@ -340,6 +464,15 @@ function isEnemiesDead() {
   const enemies = gameObjects.filter((go) => go.type === "Enemy" && !go.dead);
   return enemies.length === 0;
 }
+
+function checkForBoss() {
+  if (isEnemiesDead() && !gameObjects.some((obj) => obj.type === "Boss")) {
+    // 모든 적이 죽고 보스가 아직 게임에 등장하지 않았다면 보스 등장
+    const boss = new Boss(canvas.width / 2, 0); // 화면 상단 중앙에 보스 등장
+    gameObjects.push(boss);
+  }
+}
+
 function displayMessage(message, color = "red") {
   ctx.font = "30px Arial";
   ctx.fillStyle = color;
@@ -408,6 +541,7 @@ const Messages = {
 let heroImg,
   enemyImg,
   laserImg,
+  chargedLaserImg,
   lifeImg,
   explosionImg,
   canvas,
@@ -430,13 +564,14 @@ window.onload = async () => {
   enemyImg = await loadTexture("assets/enemyShip.png");
   laserImg = await loadTexture("assets/laserRed.png");
   lifeImg = await loadTexture("assets/life.png");
+  chargedLaserImg = await loadTexture("assets/laserGreen.png");
 
   initGame();
 
   gameLoopId = startGameLoopId(backImg);
 
   let onKeyDown = function (e) {
-    console.log(e.keyCode);
+    // console.log(e.keyCode);
     switch (e.keyCode) {
       case 37: // 왼쪽 화살표
       case 39: // 오른쪽 화살표
@@ -445,25 +580,44 @@ window.onload = async () => {
       case 32: // 스페이스바
         e.preventDefault();
         break;
+
+      case 67: // 'C' 버튼 (keyCode: 67)
+        // C 버튼을 누르면 차지 시작
+        if (!hero.isCharging) {
+          // 차징 중이 아닐 때만 시작
+          hero.startCharging();
+        }
+        break;
+
       default:
         break;
     }
   };
 
-  window.addEventListener("keydown", onKeyDown);
-  window.addEventListener("keyup", (evt) => {
-    if (evt.key === "ArrowUp") {
+  let onKeyUp = function (e) {
+    if (e.keyCode === 67) {
+      setTimeout(() => {
+        hero.releaseCharge();
+      }, 500);
+    }
+
+    // 화살표 키나 스페이스바, Enter 키 등에 대한 eventEmitter 처리
+    if (e.key === "ArrowUp") {
       eventEmitter.emit(Messages.KEY_EVENT_UP);
-    } else if (evt.key === "ArrowDown") {
+    } else if (e.key === "ArrowDown") {
       eventEmitter.emit(Messages.KEY_EVENT_DOWN);
-    } else if (evt.key === "ArrowLeft") {
+    } else if (e.key === "ArrowLeft") {
       eventEmitter.emit(Messages.KEY_EVENT_LEFT);
-    } else if (evt.key === "ArrowRight") {
+    } else if (e.key === "ArrowRight") {
       eventEmitter.emit(Messages.KEY_EVENT_RIGHT);
-    } else if (evt.keyCode === 32) {
+    } else if (e.keyCode === 32) {
+      // 스페이스바
       eventEmitter.emit(Messages.KEY_EVENT_SPACE);
-    } else if (evt.key === "Enter") {
+    } else if (e.key === "Enter") {
       eventEmitter.emit(Messages.KEY_EVENT_ENTER);
     }
-  });
+  };
+
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 };
