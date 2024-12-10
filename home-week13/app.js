@@ -20,7 +20,7 @@ class GameObject {
 
   draw(ctx) {
     //캔버스에 이미지 그리기
-    ctx.drawImage(this.img, this.x, this.y, this.width, this.height); //
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
 }
 
@@ -59,7 +59,7 @@ class Hero extends GameObject {
   releaseCharge() {
     console.log(this.isCharged);
     if (this.isCharged) {
-      this.fire(true); // 차지된 상태에서는 강화된 레이저 발사
+      this.fire(true);
       this.isCharging = false;
       this.isCharged = false;
       console.log("차지된 공격 발사!");
@@ -72,9 +72,11 @@ class Hero extends GameObject {
     if (this.canFire()) {
       let laser;
       if (charge && this === hero && this.isCharged) {
-        laser = new ChargedLaser(this.x + 45, this.y - 10); // 차지된 상태에서는 강화된 레이저
+        laser = new ChargedLaser(this.x + 45 - 4, this.y - 10); // 차지된 상태에서는 강화된 레이저
+      } else if (this !== hero) {
+        laser = new Laser(this.x + 45 - 28, this.y - 10);
       } else {
-        laser = new Laser(this.x + 45, this.y - 10); // 기본 레이저
+        laser = new Laser(this.x + 45, this.y - 10);
       }
       gameObjects.push(laser);
       this.cooldown = 500; // 쿨다운 500ms
@@ -93,10 +95,13 @@ class Hero extends GameObject {
     return this.cooldown === 0;
   }
 
-  decrementLife() {
-    this.life--;
-    if (this.life === 0) {
+  // 체력 감소 메서드
+  decrementLife(damage) {
+    this.life -= damage;
+    if (this.life <= 0) {
+      this.life = 0;
       this.dead = true;
+      console.log("Hero is dead");
     }
   }
 
@@ -129,11 +134,11 @@ class Laser extends GameObject {
 class ChargedLaser extends Laser {
   constructor(x, y) {
     super(x, y);
-    this.width = 18; // 강화된 레이저는 더 큰 크기
-    this.height = 66; // 강화된 레이저는 더 큰 크기
-    this.img = chargedLaserImg; // 강화된 레이저 이미지
-    this.speed = 30; // 강화된 레이저는 더 빠르게 이동
-    this.damage = 5; // 강화된 레이저는 더 큰 데미지
+    this.width = 18;
+    this.height = 66;
+    this.img = chargedLaserImg;
+    this.speed = 30;
+    this.damage = 10;
   }
 }
 
@@ -158,36 +163,63 @@ class Enemy extends GameObject {
 class Boss extends GameObject {
   constructor(x, y) {
     super(x, y);
-    this.width = 100;
-    this.height = 100;
+    this.width = 180;
+    this.height = 230;
     this.type = "Boss";
-    this.life = 200; // 보스의 체력
+    this.maxLife = 200;
+    this.life = this.maxLife;
     this.img = bossImg; // 보스 이미지
-    this.speed = 5; // 보스 이동 속도
+    this.speed1 = 10; // 보스 등장 이동 속도
+    this.speed2 = 5; // 보스 패턴 이동 속도
+    this.isMovingToCenter = true; // 중앙으로 내려가는 상태 확인
+    this.isMovingLeftRight = false; // 좌우로 이동하는 상태 확인
+    this.moveDirection = "right"; // 초기 좌우 이동 방향
 
-    // 보스가 Hero를 향해 이동
+    // 보스를 화면 상단 밖에서 시작
+    this.y = -this.height;
+
+    // 보스가 중앙 상단으로부터 내려오기
     this.moveInterval = setInterval(() => {
-      if (this.x < hero.x) {
-        this.x += this.speed; // Hero를 향해 오른쪽으로 이동
-      } else if (this.x > hero.x) {
-        this.x -= this.speed; // Hero를 향해 왼쪽으로 이동
-      }
-
-      if (this.y < hero.y) {
-        this.y += this.speed; // Hero를 향해 아래로 이동
-      } else if (this.y > hero.y) {
-        this.y -= this.speed; // Hero를 향해 위로 이동
+      if (this.isMovingToCenter) {
+        // 중앙으로 내려가기 (y축)
+        if (this.y < (canvas.height * 1) / 4 - (this.height * 2) / 3) {
+          this.y += this.speed1; // 아래로 이동
+        } else {
+          this.isMovingToCenter = false; // 중앙에 도달하면 좌우 이동으로 변경
+          this.isMovingLeftRight = true;
+        }
+      } else if (this.isMovingLeftRight) {
+        // 중앙에 도달하면 좌우로 이동
+        if (this.moveDirection === "right") {
+          this.x += this.speed2; // 오른쪽으로 이동
+          if (this.x > canvas.width - this.width) {
+            this.moveDirection = "left"; // 오른쪽 끝에 도달하면 왼쪽으로 이동
+          }
+        } else if (this.moveDirection === "left") {
+          this.x -= this.speed2; // 왼쪽으로 이동
+          if (this.x < 0) {
+            this.moveDirection = "right"; // 왼쪽 끝에 도달하면 오른쪽으로 이동
+          }
+        }
       }
     }, 100);
 
     // 보스 공격
     this.attackInterval = setInterval(() => {
-      this.attack();
-    }, 2000); // 2초마다 공격
+      if (this.life > 0 && !hero.dead) {
+        this.attack();
+      } else {
+        clearInterval(this.attackInterval);
+      }
+    }, 2000);
   }
 
   attack() {
-    let attack = new BossAttack(this.x + this.width / 2, this.y + this.height);
+    let attack = new BossAttack(
+      this.x + this.width / 2,
+      this.y + this.height,
+      hero
+    );
     gameObjects.push(attack);
   }
 
@@ -199,22 +231,55 @@ class Boss extends GameObject {
       clearInterval(this.attackInterval); // 보스가 죽으면 공격 멈춤
     }
   }
+
+  // 보스의 HP를 게이지 형태로 화면 상단에 표시
+  drawHPBar(ctx) {
+    const barWidth = 1000; // HP 바의 너비
+    const barHeight = 16; // HP 바의 높이
+
+    // HP 바 배경 (빈 바)
+    ctx.fillStyle = "gray";
+    ctx.fillRect(canvas.width / 2 - barWidth / 2, 30, barWidth, barHeight);
+
+    // HP 바 (현재 체력)
+    const currentHPWidth = (this.life / this.maxLife) * barWidth;
+    ctx.fillStyle = "red"; // HP 바 색상
+    ctx.fillRect(
+      canvas.width / 2 - barWidth / 2,
+      30,
+      currentHPWidth,
+      barHeight
+    );
+  }
+
+  // 보스의 이미지를 그리고 HP 바를 화면 상단에 표시
+  draw(ctx) {
+    ctx.drawImage(this.img, this.x, this.y + 40, this.width, this.height);
+    this.drawHPBar(ctx); // 보스의 HP 바를 화면 상단에 표시
+  }
 }
 
 class BossAttack extends GameObject {
-  constructor(x, y) {
+  constructor(x, y, hero) {
     super(x, y);
-    this.width = 20;
-    this.height = 30;
+    this.width = 15;
+    this.height = 35;
     this.type = "BossAttack";
-    this.img = bossAttackImg; // 보스 공격 이미지
-    this.speed = 10; // 공격 속도
-    this.damage = 10; // 공격 데미지
+    this.img = bossAttackImg;
+    this.damage = 1;
+
+    const deltaX = hero.x - this.x;
+    const deltaY = hero.y - this.y;
+
+    const angle = Math.atan2(deltaY, deltaX);
+    this.speedX = Math.cos(angle) * 15;
+    this.speedY = Math.sin(angle) * 10;
 
     // 공격은 아래로 이동
     let id = setInterval(() => {
       if (this.y < canvas.height) {
-        this.y += this.speed; // 공격이 아래로 이동
+        this.x += this.speedX;
+        this.y += this.speedY;
       } else {
         this.dead = true; // 화면 아래로 내려가면 제거
         clearInterval(id);
@@ -325,24 +390,24 @@ function initGame() {
   sideHero3();
 
   eventEmitter.on(Messages.KEY_EVENT_UP, () => {
-    hero.y -= 5;
-    hero2.y -= 5;
-    hero3.y -= 5;
+    hero.y -= 10;
+    hero2.y -= 10;
+    hero3.y -= 10;
   });
   eventEmitter.on(Messages.KEY_EVENT_DOWN, () => {
-    hero.y += 5;
-    hero2.y += 5;
-    hero3.y += 5;
+    hero.y += 10;
+    hero2.y += 10;
+    hero3.y += 10;
   });
   eventEmitter.on(Messages.KEY_EVENT_LEFT, () => {
-    hero.x -= 5;
-    hero2.x -= 5;
-    hero3.x -= 5;
+    hero.x -= 10;
+    hero2.x -= 10;
+    hero3.x -= 10;
   });
   eventEmitter.on(Messages.KEY_EVENT_RIGHT, () => {
-    hero.x += 5;
-    hero2.x += 5;
-    hero3.x += 5;
+    hero.x += 10;
+    hero2.x += 10;
+    hero3.x += 10;
   });
 
   eventEmitter.on(Messages.KEY_EVENT_SPACE, () => {
@@ -370,26 +435,81 @@ function initGame() {
     enemy.dead = true;
     hero.decrementLife();
   });
+
   eventEmitter.on(Messages.COLLISION_ENEMY_LASER, (_, { first, second }) => {
+    console.log(`second: ${second.type}`);
     first.dead = true;
     second.dead = true;
     hero.incrementPoints();
-    if (isEnemiesDead()) {
-      eventEmitter.emit(Messages.GAME_END_WIN);
+
+    // 적들을 모두 처치했지만 보스가 아직 등장하지 않았다면
+    if (isEnemiesDead() && !gameObjects.some((obj) => obj.type === "Boss")) {
+      const boss = new Boss(100, 0, 150, 100);
+      gameObjects.push(boss);
+      console.log("보스 등장!");
     }
   });
+
+  eventEmitter.on(Messages.COLLISION_BOSS_LASER, (_, { first, second }) => {
+    // console.log(`first: ${first.type}`);
+    // console.log(`second: ${second.type}`);
+
+    if (second.type === "Boss") {
+      second.life -= first.damage;
+      console.log(`보스 타격: ${second.life}`);
+      if (second.life <= 0) {
+        second.dead = true;
+        eventEmitter.emit(Messages.GAME_END_WIN);
+        console.log("보스 처치 완료!");
+      }
+
+      first.dead = true;
+    }
+  });
+
+  eventEmitter.on(
+    Messages.COLLISION_BOSS_ATTACK_HERO,
+    (_, { first, second }) => {
+      // first는 BossAttack, second는 hero
+      second.decrementLife(first.damage);
+
+      console.log(`히어로 체력 ${second.life}`);
+
+      if (isHeroDead()) {
+        eventEmitter.emit(Messages.GAME_END_LOSS);
+      }
+
+      first.dead = true;
+    }
+  );
+
+  eventEmitter.on(
+    Messages.COLLISION_BOSS_ATTACK_HERO,
+    (_, { first, second }) => {
+      console.log("Collision with BossAttack: ", first);
+
+      // first는 BossAttack, second는 hero
+      second.decrementLife(first.damage);
+
+      if (isHeroDead()) {
+        eventEmitter.emit(Messages.GAME_END_LOSS);
+      }
+
+      first.dead = true;
+    }
+  );
+
   eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
     console.log("Collision with enemy: ", enemy);
     enemy.dead = true;
     hero.decrementLife();
+
     if (isHeroDead()) {
       eventEmitter.emit(Messages.GAME_END_LOSS);
-      return; // loss before victory
-    }
-    if (isEnemiesDead()) {
-      eventEmitter.emit(Messages.GAME_END_WIN);
+      return;
     }
   });
+
   eventEmitter.on(Messages.GAME_END_WIN, () => {
     endGame(true);
   });
@@ -408,7 +528,10 @@ function drawGameObjects(ctx) {
 function updateGameObjects() {
   const enemies = gameObjects.filter((go) => go.type === "Enemy");
   const lasers = gameObjects.filter((go) => go.type === "Laser");
+  const bosses = gameObjects.filter((go) => go.type === "Boss");
+  const bossAttacks = gameObjects.filter((go) => go.type === "BossAttack");
 
+  // 레이저와 적들의 충돌 처리
   lasers.forEach((l) => {
     enemies.forEach((m) => {
       if (intersectRect(l.rectFromGameObject(), m.rectFromGameObject())) {
@@ -418,8 +541,30 @@ function updateGameObjects() {
         });
       }
     });
+
+    // 레이저와 보스의 충돌 처리
+    bosses.forEach((boss) => {
+      if (intersectRect(l.rectFromGameObject(), boss.rectFromGameObject())) {
+        eventEmitter.emit(Messages.COLLISION_BOSS_LASER, {
+          first: l,
+          second: boss,
+        });
+      }
+    });
   });
 
+  // BossAttack과 Hero의 충돌 처리
+  bossAttacks.forEach((attack) => {
+    if (intersectRect(attack.rectFromGameObject(), hero.rectFromGameObject())) {
+      // BossAttack과 Hero가 충돌한 경우
+      eventEmitter.emit(Messages.COLLISION_BOSS_ATTACK_HERO, {
+        first: attack, // BossAttack
+        second: hero, // Hero
+      });
+    }
+  });
+
+  // 적과 영웅의 충돌 처리
   enemies.forEach((enemy) => {
     const heroRect = hero.rectFromGameObject();
     if (intersectRect(heroRect, enemy.rectFromGameObject())) {
@@ -427,6 +572,15 @@ function updateGameObjects() {
     }
   });
 
+  // 보스와 영웅의 충돌 처리
+  bosses.forEach((boss) => {
+    const heroRect = hero.rectFromGameObject();
+    if (intersectRect(heroRect, boss.rectFromGameObject())) {
+      eventEmitter.emit(Messages.COLLISION_BOSS_HERO, { boss });
+    }
+  });
+
+  // 죽은 객체 제거
   gameObjects = gameObjects.filter((go) => !go.dead);
 }
 
@@ -467,8 +621,7 @@ function isEnemiesDead() {
 
 function checkForBoss() {
   if (isEnemiesDead() && !gameObjects.some((obj) => obj.type === "Boss")) {
-    // 모든 적이 죽고 보스가 아직 게임에 등장하지 않았다면 보스 등장
-    const boss = new Boss(canvas.width / 2, 0); // 화면 상단 중앙에 보스 등장
+    const boss = new Boss(canvas.width / 2, 0);
     gameObjects.push(boss);
   }
 }
@@ -489,13 +642,11 @@ function endGame(win) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (win) {
       displayMessage(
-        "Victory!!! Pew Pew... - Press [Enter] to start a new game Captain Pew Pew",
+        "보스 콘푸라이트를 물리쳤다!! [엔터]를 눌러 새 게임을 시작할 수 있어요",
         "green"
       );
     } else {
-      displayMessage(
-        "You died !!! Press [Enter] to start a new game Captain Pew Pew"
-      );
+      displayMessage("당신은 죽었습니다. [엔터]를 눌러 새 게임을 시작하세요.");
     }
   }, 200);
 }
@@ -536,6 +687,9 @@ const Messages = {
   GAME_END_LOSS: "GAME_END_LOSS",
   GAME_END_WIN: "GAME_END_WIN",
   KEY_EVENT_ENTER: "KEY_EVENT_ENTER",
+  COLLISION_BOSS_HERO: "COLLISION_BOSS_HERO",
+  COLLISION_BOSS_LASER: "COLLISION_BOSS_LASER",
+  COLLISION_BOSS_ATTACK_HERO: "COLLISION_BOSS_ATTACK_HERO",
 };
 
 let heroImg,
@@ -550,6 +704,8 @@ let heroImg,
   hero,
   hero2,
   hero3,
+  bossImg,
+  bossAttackImg,
   eventEmitter = new EventEmitter();
 
 let gameLoopId = null;
@@ -565,6 +721,8 @@ window.onload = async () => {
   laserImg = await loadTexture("assets/laserRed.png");
   lifeImg = await loadTexture("assets/life.png");
   chargedLaserImg = await loadTexture("assets/laserGreen.png");
+  bossImg = await loadTexture("assets/boss.png");
+  bossAttackImg = await loadTexture("assets/bossAttack.png");
 
   initGame();
 
